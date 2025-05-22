@@ -71,39 +71,11 @@ def generate_frames():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """
-    Render the main page and handle form submissions for user voting.
-    Cookies are used to prevent multiple votes.
+    Render the main page and handle conversation and 
+    places from the NLP.
     """
     spoke = load_json(spoke_path)
-    vote_cookie_key = get_vote_cookie_key()
-    has_voted = request.cookies.get(vote_cookie_key)
-
-    if request.method == 'POST' and not has_voted:
-        user_answer = request.form.get("answer")
-        if user_answer in options:
-            answers.append(user_answer)
-            # Set cookie to prevent duplicate voting
-            response = make_response(redirect(url_for("index")))
-            response.set_cookie(vote_cookie_key, "true", max_age=60*60*24)
-            return response
-        else:
-            return redirect(url_for("index"))
-
-    count = Counter(answers)
-    if count and count[options[0]] == count[options[1]]:
-        most_common = "Equal answers."
-    elif count:
-        most_common = f"Most common answer: {count.most_common(1)[0][0]}"
-    else:
-        most_common = "No answers yet."
-
-    return render_template(
-        'index.html',
-        spoke=spoke,
-        most_common=most_common,
-        options=options,
-        has_voted=bool(has_voted)
-    )
+    return render_template('index.html', spoke=spoke)
 
 @app.route('/video')
 def video():
